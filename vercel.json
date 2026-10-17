@@ -1,5 +1,11 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "api/*.js",
+      "use": "@vercel/node"
+    }
+  ],
   "rewrites": [
     {
       "source": "/live.mpd",
@@ -20,6 +26,10 @@
     {
       "source": "/api",
       "destination": "/api/vega.js"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*.js"
     }
   ]
 }
