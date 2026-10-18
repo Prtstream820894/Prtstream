@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   try {
     const urls = [
       "https://royal-bird-6a0a.poonamchouhan076.workers.dev/",
-      "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/"
+      "https://vk-playlist.pages.dev/sony.m3u"
     ];
 
     const timestamp = Date.now();
