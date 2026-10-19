@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const url3 = "https://raw.githubusercontent.com/Prtstream820894/Prtlive_stream/refs/heads/main/playlist.m3u"; // Nayi playlist add ki gayi hai 
     
 
-    const url4 = ""; // Nayi NCC playlist add ki
+    const url4 = ""; // Nayi NCC playlist add k
   
     
 
