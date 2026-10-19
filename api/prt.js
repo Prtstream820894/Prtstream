@@ -25,7 +25,7 @@ export default {
         }
         if (line.startsWith("#EXTINF:")) {
           if (currentChannel) channels.push(currentChannel);
-          const groupMatch = line.match(/group-title="([^"]+)"/i);
+          const groupMatch = line.match(/group-title=["']([^"']+)["']/i);
           currentChannel = { extinf: line, groupTitle: groupMatch ? groupMatch[1] : "", extraMetadata: [], url: "" };
         } else if (currentChannel) {
           if (line.startsWith("#")) currentChannel.extraMetadata.push(line);
@@ -36,7 +36,7 @@ export default {
 
       const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
       
-      // Yaha order change kiya - 🫦Adult upar, 🔥18+ neeche
+      // Ab dono groups ALAG ALAG hain
       const groupOrder = [
         targetLiveKey,
         "new movies",
@@ -44,6 +44,7 @@ export default {
         "latest movies",
         "🫦Adult",
         "🔥18+",
+        "🔞Porn", // Alag Porn Group
         "filmyfy latest",
         "highlights",
         "✨Upcoming Events✨",
@@ -68,24 +69,36 @@ export default {
         const ch = channels[i];
         const groupLower = ch.groupTitle.trim().toLowerCase();
 
+        const updateGroup = (newGroup) => {
+          if (/group-title=["'][^"']+["']/i.test(ch.extinf)) {
+            ch.extinf = ch.extinf.replace(/group-title=["'][^"']+["']/i, `group-title="${newGroup}"`);
+          } else {
+            ch.extinf = ch.extinf.replace(/#EXTINF:/i, `#EXTINF:-1 group-title="${newGroup}" `);
+          }
+        };
+
         if (groupLower.includes("upcoming")) {
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');
+          updateGroup("✨Upcoming Events✨");
           groupedChannels["✨Upcoming Events✨"].push(ch);
         } else if (groupLower.includes("live") || groupLower.includes("event") || groupLower.includes("ʟɪᴠᴇ") || groupLower.includes("ᴇᴠᴇɴᴛ")) {
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);
+          updateGroup(targetLiveKey);
           groupedChannels[targetLiveKey].push(ch);
-        } else if (groupLower.includes("adult") || groupLower.includes("sex")) {
-          // Adult / Sex -> 🫦Adult me jayega (18+ ke upar)
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="🫦Adult"');
-          groupedChannels["🫦Adult"].push(ch);
-        } else if (groupLower.includes("18+") || groupLower.includes("xxx") || groupLower.includes("porn")) {
-          // Sirf 18+ wala hi 18+ me rahega, dusre group me nahi jayega
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="🔥18+"');
+        } else if (groupLower.includes("porn") || groupLower.includes("xxx") || groupLower.includes("sex")) {
+          // Explicit Porn / Sex / XXX -> sirf 🔞Porn group me jayega
+          updateGroup("🔞Porn");
+          groupedChannels["🔞Porn"].push(ch);
+        } else if (groupLower.includes("18+")) {
+          // Pure 18+ wale -> sirf 🔥18+ group me jayenge
+          updateGroup("🔥18+");
           groupedChannels["🔥18+"].push(ch);
+        } else if (groupLower.includes("adult")) {
+          // Adult -> 🫦Adult group me
+          updateGroup("🫦Adult");
+          groupedChannels["🫦Adult"].push(ch);
         } else if (groupLower === "sports") groupedChannels["sports"].push(ch);
         else if (groupLower.includes("new movies")) groupedChannels["new movies"].push(ch);
         else if (groupLower.includes("lastest hub movies") || groupLower.includes("hub movies")) {
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨ Lastest Hub Movies"');
+          updateGroup("✨ Lastest Hub Movies");
           groupedChannels["✨ Lastest Hub Movies"].push(ch);
         } else if (groupLower.includes("latest movies")) groupedChannels["latest movies"].push(ch);
         else if (groupLower.includes("filmyfy latest")) groupedChannels["filmyfy latest"].push(ch);
