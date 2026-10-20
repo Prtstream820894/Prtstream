@@ -43,7 +43,7 @@ export default {
         "✨ Lastest Hub Movies",
         "latest movies",
         "🫦Adult",
-        "🔥18+",
+        "🔞18+",
         "🔞Porn", // Alag Porn Group
         "filmyfy latest",
         "highlights",
@@ -88,9 +88,9 @@ export default {
           updateGroup("🔞Porn");
           groupedChannels["🔞Porn"].push(ch);
         } else if (groupLower.includes("18+")) {
-          // Pure 18+ wale -> sirf 🔥18+ group me jayenge
-          updateGroup("🔥18+");
-          groupedChannels["🔥18+"].push(ch);
+          // Pure 18+ wale -> sirf🔞18+ group me jayenge
+          updateGroup("🔞18+");
+          groupedChannels["🔞18+"].push(ch);
         } else if (groupLower.includes("adult")) {
           // Adult -> 🫦Adult group me
           updateGroup("🫦Adult");
