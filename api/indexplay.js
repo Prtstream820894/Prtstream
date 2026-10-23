@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   try {
     const url1 = "https://lucky-hat-6f1c.poonamchouhan076.workers.dev/";
-    const url2 = "https://raw.githubusercontent.com/Prtstream820894/Allmovies-playlist/refs/heads/main/playlist.m3u";
+    const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
     const url3 = "https://raw.githubusercontent.com/Prtstream820894/Prtlive_stream/refs/heads/main/playlist.m3u"; // Nayi playlist add ki gayi hai 
     
 
