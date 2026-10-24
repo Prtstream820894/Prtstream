@@ -1,13 +1,12 @@
 export default async function handler(req, res) {
   try {
     const urls = [
-      "https://royal-bird-6a0a.poonamchouhan076.workers.dev/",
-      "https://raw.githubusercontent.com/Prtstream820894/Liv/refs/heads/main/new_sony.m3u"
+      "https://royal-bird-6a0a.poonamchouhan076.workers.dev/"
     ];
 
     const timestamp = Date.now();
 
-    // ⚡ Dono link se sidha raw text format me playlist fetch karenge
+    // ⚡ Link se sidha raw text format me playlist fetch karenge
     const responses = await Promise.all(
       urls.map(url => {
         const freshUrl = url.includes('?') ? `${url}&_t=${timestamp}` : `${url}?_t=${timestamp}`;
@@ -22,16 +21,16 @@ export default async function handler(req, res) {
           }
         })
           .then(r => (r.ok ? r.text() : ""))
-          .catch(() => ""); // Agar koi ek down ho toh khali string return karega
+          .catch(() => ""); // Agar down ho toh khali string return karega
       })
     );
 
-    // 🎯 Har playlist se #EXTM3U tag ko saaf karenge taaki beech me repeat na ho
+    // 🎯 Playlist se #EXTM3U tag ko saaf karenge
     const cleanPlaylists = responses.map(text => {
       return text.replace("#EXTM3U", "").trim();
     });
 
-    // 🔗 Sabko ek sath jodenge aur main #EXTM3U tag sirf ek baar sabse upar lagayenge
+    // 🔗 Main #EXTM3U tag sabse upar lagayenge
     const finalPlaylist = "#EXTM3U\n" + cleanPlaylists.filter(Boolean).join("\n");
 
     // 🚀 Strong Cache Bypass Headers taaki instantly naya channel dikhe
