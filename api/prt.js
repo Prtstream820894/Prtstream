@@ -36,15 +36,12 @@ export default {
 
       const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
       
-      // Ab dono groups ALAG ALAG hain
+      // Standard Group Order (Adult groups ko yahan se hata kar sabse niche kar diya hai)
       const groupOrder = [
         targetLiveKey,
         "new movies",
         "✨ Lastest Hub Movies",
         "latest movies",
-        "🫦Adult",
-        "🔞18+",
-        "🔞Porn", // Alag Porn Group
         "filmyfy latest",
         "highlights",
         "✨Upcoming Events✨",
@@ -61,8 +58,12 @@ export default {
         "kids"
       ];
 
+      // Adult / 18+ specific groups
+      const adultGroups = ["🫦Adult", "🔞18+", "🔞Porn"];
+      const allGroups = [...groupOrder, ...adultGroups];
+
       let groupedChannels = {};
-      for (let j = 0; j < groupOrder.length; j++) groupedChannels[groupOrder[j]] = [];
+      for (let j = 0; j < allGroups.length; j++) groupedChannels[allGroups[j]] = [];
       let otherChannels = [];
 
       for (let i = 0; i < channels.length; i++) {
@@ -84,15 +85,12 @@ export default {
           updateGroup(targetLiveKey);
           groupedChannels[targetLiveKey].push(ch);
         } else if (groupLower.includes("porn") || groupLower.includes("xxx") || groupLower.includes("sex")) {
-          // Explicit Porn / Sex / XXX -> sirf 🔞Porn group me jayega
           updateGroup("🔞Porn");
           groupedChannels["🔞Porn"].push(ch);
         } else if (groupLower.includes("18+")) {
-          // Pure 18+ wale -> sirf🔞18+ group me jayenge
           updateGroup("🔞18+");
           groupedChannels["🔞18+"].push(ch);
         } else if (groupLower.includes("adult")) {
-          // Adult -> 🫦Adult group me
           updateGroup("🫦Adult");
           groupedChannels["🫦Adult"].push(ch);
         } else if (groupLower === "sports") groupedChannels["sports"].push(ch);
@@ -119,6 +117,8 @@ export default {
       }
 
       let output = [headerLines.length > 0 ? headerLines.join("\n") : "#EXTM3U"];
+      
+      // 1. Pehle normal groups print honge
       for (let i = 0; i < groupOrder.length; i++) {
         const chList = groupedChannels[groupOrder[i]];
         for (let j = 0; j < chList.length; j++) {
@@ -128,11 +128,24 @@ export default {
           output.push(ch.url);
         }
       }
+
+      // 2. Phir other/uncategorized channels print honge
       for (let i = 0; i < otherChannels.length; i++) {
         const ch = otherChannels[i];
         output.push(ch.extinf);
         if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
         output.push(ch.url);
+      }
+
+      // 3. Sabse Last mein Adult / 18+ / Porn groups print honge
+      for (let i = 0; i < adultGroups.length; i++) {
+        const chList = groupedChannels[adultGroups[i]];
+        for (let j = 0; j < chList.length; j++) {
+          const ch = chList[j];
+          output.push(ch.extinf);
+          if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
+          output.push(ch.url);
+        }
       }
 
       return new Response(output.join("\n"), {
