@@ -40,7 +40,7 @@ export default {
       const groupOrder = [
         targetLiveKey,
         "new movies",
-        "✨ Lastest Hub Movies",
+        "🎬 NEW 4K",
         "latest movies",
         "filmyfy latest",
         "highlights",
@@ -95,9 +95,9 @@ export default {
           groupedChannels["🫦Adult"].push(ch);
         } else if (groupLower === "sports") groupedChannels["sports"].push(ch);
         else if (groupLower.includes("new movies")) groupedChannels["new movies"].push(ch);
-        else if (groupLower.includes("lastest hub movies") || groupLower.includes("hub movies")) {
-          updateGroup("✨ Lastest Hub Movies");
-          groupedChannels["✨ Lastest Hub Movies"].push(ch);
+        else if (groupLower.includes("🎬 NEW 4K") || groupLower.includes("hub movies")) {
+          updateGroup("🎬 NEW 4K");
+          groupedChannels["🎬 NEW 4K"].push(ch);
         } else if (groupLower.includes("latest movies")) groupedChannels["latest movies"].push(ch);
         else if (groupLower.includes("filmyfy latest")) groupedChannels["filmyfy latest"].push(ch);
         else {
