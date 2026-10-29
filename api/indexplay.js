@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
     const url4 = "https://raw.githubusercontent.com/poonamchouhan828/xnxx/refs/heads/main/playlist.m3u"; // Nayi NCC playlist add k
   
-    
+    const url5 = "https://raw.githubusercontent.com/PRTSTREAM/PRTSTREAM.github.io/refs/heads/main/test.txt";
 
     const fetchWithTimeout = async (url, ms = 8000) => {
       if (!url) return "";
@@ -60,6 +60,7 @@ export default async function handler(req, res) {
       fetchWithTimeout(url2, 30000),
       fetchWithTimeout(url3, 20000),
       fetchWithTimeout(url4, 20000),
+      fetchWithTimeout(url5, 20000),
       
     ]);
 
