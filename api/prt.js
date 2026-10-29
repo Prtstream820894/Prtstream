@@ -41,6 +41,7 @@ export default {
         targetLiveKey,
         "new movies",
         "🎬 new 4k",
+        "Sony Channels ",
         "latest movies",
         "filmyfy latest",
         "highlights",
@@ -98,7 +99,13 @@ export default {
         else if (groupLower.includes("🎬 new 4k") || groupLower.includes("hub movies")) {
           updateGroup("🎬 new 4k");
           groupedChannels["🎬 new 4k"].push(ch);
-        } else if (groupLower.includes("latest movies")) groupedChannels["latest movies"].push(ch);
+        }
+                 else if (groupLower.includes("sony channels")) {
+          updateGroup("Sony Channels ");
+          groupedChannels["Sony Channels "].push(ch);
+        } 
+
+        else if (groupLower.includes("latest movies")) groupedChannels["latest movies"].push(ch);
         else if (groupLower.includes("filmyfy latest")) groupedChannels["filmyfy latest"].push(ch);
         else {
           if (groupLower.includes("highlights")) groupedChannels["highlights"].push(ch);
