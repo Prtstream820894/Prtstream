@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
 
     try {
         const { data: searchHtml } = await axios.get(searchUrl, {
-            timeout: 5000,
+            timeout: 6000,
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
 
@@ -35,11 +35,11 @@ module.exports = async (req, res) => {
 
         let results = [];
 
-        // Timeout se bachne ke liye sirf top 2 movies rakhi hain
+        // Safe limit to top 2 movies
         for (let movie of moviesList.slice(0, 2)) {
             try {
                 const { data: postHtml } = await axios.get(movie.postUrl, {
-                    timeout: 4000,
+                    timeout: 5000,
                     headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
                 });
                 const $$ = cheerio.load(postHtml);
@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
                         if (btnText.includes('1080p') || btnText.includes('720p')) {
                             targetLink = href;
                             if (btnText.includes('720p')) selectedQuality = '720p';
-                            return false; // mil gaya toh break karo
+                            return false;
                         }
                     }
                 });
@@ -65,31 +65,36 @@ module.exports = async (req, res) => {
 
                     try {
                         const redirectRes = await axios.get(targetLink, {
-                            timeout: 4000,
+                            timeout: 5000,
                             maxRedirects: 5,
                             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
                         });
                         
-                        let gdflixUrl = redirectRes.request?.res?.responseUrl || redirectRes.config?.url;
+                        // Safe URL extraction
+                        let gdflixUrl = redirectRes.config.url;
+                        if (redirectRes.request && redirectRes.request.res && redirectRes.request.res.responseUrl) {
+                            gdflixUrl = redirectRes.request.res.responseUrl;
+                        }
 
                         if (gdflixUrl && gdflixUrl.includes('/file/')) {
                             let cloudUrl = gdflixUrl.replace('/file/', '/cloud/');
-                            const { data: cloudHtml } = await axios.get(cloudUrl, {
-                                timeout: 4000,
+                            const cloudRes = await axios.get(cloudUrl, {
+                                timeout: 5000,
                                 headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
                             });
+                            const cloudHtml = cloudRes.data;
                             const $$$ = cheerio.load(cloudHtml);
 
                             $$$('a').each((j, linkEl) => {
-                                const lHref = $$$(linkEl).attr('href');
+                                const lHref = $$$ (linkEl).attr('href');
                                 if (lHref && lHref.includes('workers.dev')) {
                                     finalLink = lHref;
                                     return false;
                                 }
                             });
                         }
-                    } catch (e) {
-                        // Agar redirect ya cloud fail ho toh original link use karo
+                    } catch (innerErr) {
+                        // Agar redirect ya cloud fetch fail ho, toh targetLink hi use hoga (no crash)
                     }
 
                     results.push({
@@ -99,8 +104,8 @@ module.exports = async (req, res) => {
                         downloadLink: finalLink
                     });
                 }
-            } catch (err) {
-                // Skip invalid posts
+            } catch (postErr) {
+                // Skip individual post errors safely
             }
         }
 
