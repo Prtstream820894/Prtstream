@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
 
     try {
         const { data: searchHtml } = await axios.get(searchUrl, {
+            timeout: 5000,
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
 
@@ -34,65 +35,53 @@ module.exports = async (req, res) => {
 
         let results = [];
 
-        // Sirf top 4 movies tak jayenge
-        for (let movie of moviesList.slice(0, 4)) {
+        // Timeout se bachne ke liye sirf top 2 movies rakhi hain
+        for (let movie of moviesList.slice(0, 2)) {
             try {
                 const { data: postHtml } = await axios.get(movie.postUrl, {
+                    timeout: 4000,
                     headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
                 });
                 const $$ = cheerio.load(postHtml);
 
                 let targetLink = null;
-                let selectedQuality = '';
+                let selectedQuality = '1080p';
 
-                let found1080 = null;
-                let found720 = null;
-
-                // 1080p aur 720p buttons ko dhoondo, 480p ko ignore karo
                 $$('a.dl').each((i, el) => {
                     const btnText = $$(el).closest('p').prev('h5').text() || $$(el).text() || '';
                     const href = $$(el).attr('href');
 
                     if (href && (href.includes('fastdlserver.site') || href.includes('gdflix'))) {
-                        if (btnText.includes('1080p') && !found1080) {
-                            found1080 = href;
-                        } else if (btnText.includes('720p') && !found720) {
-                            found720 = href;
+                        if (btnText.includes('1080p') || btnText.includes('720p')) {
+                            targetLink = href;
+                            if (btnText.includes('720p')) selectedQuality = '720p';
+                            return false; // mil gaya toh break karo
                         }
                     }
                 });
-
-                // Priority: Pehle 1080p, phir 720p
-                if (found1080) {
-                    targetLink = found1080;
-                    selectedQuality = '1080p';
-                } else if (found720) {
-                    targetLink = found720;
-                    selectedQuality = '720p';
-                }
 
                 if (targetLink) {
                     let finalLink = targetLink;
 
                     try {
-                        // Redirect follow karke asali gdflix link nikalna
                         const redirectRes = await axios.get(targetLink, {
+                            timeout: 4000,
                             maxRedirects: 5,
                             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
                         });
                         
-                        let gdflixUrl = redirectRes.request.res.responseUrl || redirectRes.config.url;
+                        let gdflixUrl = redirectRes.request?.res?.responseUrl || redirectRes.config?.url;
 
-                        // /file/ ko /cloud/ me badalna
                         if (gdflixUrl && gdflixUrl.includes('/file/')) {
                             let cloudUrl = gdflixUrl.replace('/file/', '/cloud/');
                             const { data: cloudHtml } = await axios.get(cloudUrl, {
+                                timeout: 4000,
                                 headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
                             });
                             const $$$ = cheerio.load(cloudHtml);
 
                             $$$('a').each((j, linkEl) => {
-                                const lHref = $$(linkEl).attr('href') || $$$ (linkEl).attr('href');
+                                const lHref = $$$(linkEl).attr('href');
                                 if (lHref && lHref.includes('workers.dev')) {
                                     finalLink = lHref;
                                     return false;
@@ -100,7 +89,7 @@ module.exports = async (req, res) => {
                             });
                         }
                     } catch (e) {
-                        // Agar kuch error aaye toh target link rehne do
+                        // Agar redirect ya cloud fail ho toh original link use karo
                     }
 
                     results.push({
@@ -111,11 +100,10 @@ module.exports = async (req, res) => {
                     });
                 }
             } catch (err) {
-                // Skip error posts
+                // Skip invalid posts
             }
         }
 
-        // M3U Playlist format agar manga ho
         if (req.query.format === 'm3u') {
             let m3uContent = '#EXTM3U\n';
             results.forEach((m) => {
