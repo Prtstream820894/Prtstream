@@ -2,20 +2,20 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 module.exports = async (req, res) => {
-    // URL se dynamic movie name pakadna (jaise ?movies=avatar ya ?movies=spiderman)
+    // URL se dynamic movie name pakadna (jaise ?movies=dil+chahata+hai)
     const query = req.query.movies || req.query.q;
     
     if (!query) {
         return res.status(400).json({ 
             success: false, 
-            error: "Bhai, movie ka naam toh daal! Example: /api/search?movies=avatar" 
+            error: "Bhai, movie ka naam daalna mat bhool! Example: /api/bolly?movies=dil+chahata+hai" 
         });
     }
 
     const searchUrl = `https://bollyflix.church/search/${encodeURIComponent(query)}`;
 
     try {
-        // Step 1: Dynamic search URL par request bhejo
+        // Step 1: Bollyflix par dynamic search request bhejo
         const { data: searchHtml } = await axios.get(searchUrl, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
@@ -37,8 +37,8 @@ module.exports = async (req, res) => {
 
         let results = [];
 
-        // Step 3: Har movie ke post page par jao aur quality (1080p/720p) link dhundo
-        for (let movie of moviesList.slice(0, 5)) { // Fast response ke liye top 5
+        // Step 3: Har movie ke post page par jao aur 1080p/720p link dhundo
+        for (let movie of moviesList.slice(0, 5)) {
             try {
                 const { data: postHtml } = await axios.get(movie.postUrl, {
                     headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
                 let targetLink = null;
                 let selectedQuality = '';
 
-                // Step 4: 1080p ya 720p ka link extract karo
+                // Step 4: Quality link extract karo
                 $$('a.dl').each((i, el) => {
                     const btnText = $$(el).closest('p').prev('h5').text() || $$(el).text();
                     const href = $$(el).attr('href');
@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
                     if (href && (btnText.includes('1080p') || btnText.includes('720p'))) {
                         targetLink = href;
                         selectedQuality = btnText.includes('1080p') ? '1080p' : '720p';
-                        return false; // Break loop once found
+                        return false; 
                     }
                 });
 
@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
             }
         }
 
-        // Step 5: Agar format=m3u manga hai, toh M3U playlist format do, warna JSON
+        // Step 5: Agar format=m3u manga hai, toh M3U playlist do, warna JSON
         if (req.query.format === 'm3u') {
             let m3uContent = '#EXTM3U\n';
             results.forEach((m) => {
