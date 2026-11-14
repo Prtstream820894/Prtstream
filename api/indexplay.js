@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const url4 = "https://raw.githubusercontent.com/poonamchouhan828/xnxx/refs/heads/main/playlist.m3u"; // Nayi NCC playlist add k
   
     const url5 = "https://raw.githubusercontent.com/PRTSTREAM/Duplalist/refs/heads/main/playlist.m3u";
-    const url6 = "https://prtstream.vercel.app/api/vega";
+    const url6 = "";
 
     const fetchWithTimeout = async (url, ms = 8000) => {
       if (!url) return "";
