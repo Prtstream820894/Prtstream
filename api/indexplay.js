@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   
     const url5 = "https://raw.githubusercontent.com/PRTSTREAM/Duplalist/refs/heads/main/playlist.m3u";
     const url6 = "https://toffybd-queen-b093.prtstream.workers.dev/";
-
+const url7 = "https://raw.githubusercontent.com/poonamchouhan54/Livesx/refs/heads/main/live_events.m3u";
     const fetchWithTimeout = async (url, ms = 8000) => {
       if (!url) return "";
 
@@ -63,6 +63,7 @@ export default async function handler(req, res) {
       fetchWithTimeout(url4, 20000),
       fetchWithTimeout(url5, 20000),
       fetchWithTimeout(url6, 20000),
+      fetchWithTimeout(url7, 20000),
       
     ]);
 
