@@ -35,10 +35,12 @@ export default {
       if (currentChannel) channels.push(currentChannel);
 
       const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
-      
-      // Standard Group Order (Adult groups ko yahan se hata kar sabse niche kar diya hai)
+      const targetLiveStreamKey = "✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨";
+
+      // Standard Group Order (Live Event ke thik neeche Live Stream)
       const groupOrder = [
         targetLiveKey,
+        targetLiveStreamKey,
         "new movies",
         "🎬 new 4k",
         "Sony Channels ",
@@ -82,6 +84,9 @@ export default {
         if (groupLower.includes("upcoming")) {
           updateGroup("✨Upcoming Events✨");
           groupedChannels["✨Upcoming Events✨"].push(ch);
+        } else if (groupLower.includes("live stream") || groupLower.includes("ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ") || groupLower.includes("ꜱᴛʀᴇᴀᴍ")) {
+          updateGroup(targetLiveStreamKey);
+          groupedChannels[targetLiveStreamKey].push(ch);
         } else if (groupLower.includes("live") || groupLower.includes("event") || groupLower.includes("ʟɪᴠᴇ") || groupLower.includes("ᴇᴠᴇɴᴛ")) {
           updateGroup(targetLiveKey);
           groupedChannels[targetLiveKey].push(ch);
@@ -99,13 +104,10 @@ export default {
         else if (groupLower.includes("🎬 new 4k") || groupLower.includes("hub movies")) {
           updateGroup("🎬 new 4k");
           groupedChannels["🎬 new 4k"].push(ch);
-        }
-                 else if (groupLower.includes("sony channels")) {
+        } else if (groupLower.includes("sony channels")) {
           updateGroup("Sony Channels ");
           groupedChannels["Sony Channels "].push(ch);
-        } 
-
-        else if (groupLower.includes("latest movies")) groupedChannels["latest movies"].push(ch);
+        } else if (groupLower.includes("latest movies")) groupedChannels["latest movies"].push(ch);
         else if (groupLower.includes("filmyfy latest")) groupedChannels["filmyfy latest"].push(ch);
         else {
           if (groupLower.includes("highlights")) groupedChannels["highlights"].push(ch);
@@ -124,7 +126,7 @@ export default {
       }
 
       let output = [headerLines.length > 0 ? headerLines.join("\n") : "#EXTM3U"];
-      
+
       // 1. Pehle normal groups print honge
       for (let i = 0; i < groupOrder.length; i++) {
         const chList = groupedChannels[groupOrder[i]];
